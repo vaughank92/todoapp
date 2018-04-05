@@ -4,8 +4,18 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var indexRouter = require('./routes/index.route');
+var usersRouter = require('./routes/users.route');
+
+var bluebird = require('bluebird');
+
+var mongoose = require('mongoose');
+mongoose.Promise = bluebird;
+mongoose.connect('mongodb://localhost:27017/todoapp')
+  .then(()=> {console.log('Connected to Mongo')})
+  .catch((e)=> {console.log('Error ' + e.message)});
+
+var api = require('./routes/api.route');
 
 var app = express();
 
@@ -21,6 +31,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+
+app.use('/api', api);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
